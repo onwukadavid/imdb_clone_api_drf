@@ -10,11 +10,12 @@ from rest_framework.exceptions import ValidationError
 # from rest_framework import mixins
 
 from watchlist_app.models import WatchList, StreamPlatform, Review
-from watchlist_app.api.permissions import ReviewUserOrReadOnly
+from watchlist_app.api.permissions import IsReviewUserOrReadOnly, IsAdminOrReadOnly
 from watchlist_app.api.serializers import WatchListSerializer, StreamPlatformSerializers, ReviewSerializer
 
 class ReviewCreate(generics.CreateAPIView):
     serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
         return Review.objects.all()
@@ -29,11 +30,21 @@ class ReviewCreate(generics.CreateAPIView):
         if review_queryset.exists():
             raise ValidationError('A review already exists for this user')
         
+        
+        if watchlist.number_rating == 0:
+            watchlist.avg_rating = serializer.validated_data['rating']
+        else:
+            watchlist.avg_rating = (watchlist.avg_rating + serializer.validated_data['rating']) / 2
+            
+        watchlist.number_rating = watchlist.number_rating + 1
+        
+        watchlist.save()
+        
         return serializer.save(watchlist=watchlist, review_user=review_user)
 
 class ReviewList(generics.ListAPIView):
     # queryset = Review.objects.all()
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticated]
     serializer_class = ReviewSerializer
     
     def get_queryset(self):
@@ -41,7 +52,7 @@ class ReviewList(generics.ListAPIView):
         return Review.objects.filter(watchlist=pk)
     
 class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated, ReviewUserOrReadOnly]
+    permission_classes = [IsAuthenticated, IsReviewUserOrReadOnly]
     queryset = Review
     serializer_class = ReviewSerializer
 
@@ -146,6 +157,8 @@ class StreamPlatformListAV(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
         
 class StreamPlatformDetailAV(APIView):
+    permission_classes = [IsAdminOrReadOnly]
+    
     def get(self, request, pk):
         try:
             platform = StreamPlatform.objects.get(pk=pk)
