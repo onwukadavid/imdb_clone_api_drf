@@ -52,7 +52,7 @@ class ReviewList(generics.ListAPIView):
         return Review.objects.filter(watchlist=pk)
     
 class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated, IsReviewUserOrReadOnly]
+    permission_classes = [IsReviewUserOrReadOnly]
     queryset = Review
     serializer_class = ReviewSerializer
 
@@ -80,6 +80,8 @@ class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
 #         return self.destroy(request, *args, **kwargs)
 
 class WatchListAV(APIView):
+    permission_classes = [IsAdminOrReadOnly]
+    
     
     def get(self, request):
         movies = WatchList.objects.all()
@@ -95,6 +97,8 @@ class WatchListAV(APIView):
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
         
 class WatchDetailAV(APIView):
+    permission_classes = [IsAdminOrReadOnly]
+    
     def get(self, request, pk):
         try:
             movie = WatchList.objects.get(pk=pk)
@@ -141,6 +145,8 @@ class WatchDetailAV(APIView):
 #         return Response(serializer.data)
     
 class StreamPlatformListAV(APIView):
+    permission_classes = [IsAdminOrReadOnly]
+    
     
     def get(self, request):
         platforms = StreamPlatform.objects.all()
