@@ -144,7 +144,9 @@ REST_FRAMEWORK = {
         'anon': '1/day',
         'user': '5/day',
         # 'review-throttle':'1/minute',
-        'review-throttle':'2/day'
+        'review-throttle':'2/day',
+        'review-create':'2/day',
+        'review-list':'2/day'
     },
     
     'DEFAULT_RENDERER_CLASSES':[
