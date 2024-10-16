@@ -39,4 +39,4 @@ def registration_view(request):
         else:
             data = serializer.errors
             
-        return Response(data=data)
+        return Response(data=data, status=status.HTTP_201_CREATED)
