@@ -1,4 +1,4 @@
-# imdb_clon_api #
+# IMDB API Clone With DRF #
 
 This project involves creating a clone of the IMDb API using Django Rest Framework (DRF). The goal is to replicate core IMDb functionalities, such as searching for movies, retrieving details on films, ratings, and reviews, and filtering by genre, or rating. 
 
